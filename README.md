@@ -2,7 +2,7 @@
 
 While there are a variety of technologies out there today that make managing diabetes easier, they are generally single-purpose and integration of information between multiple devices can mean double or triple entry of information.  
 
-The goal of this project is to improve visibility with minimal lift by extracting information from various monitoring and management devices to allow for insights that are not possible on their own.  
+The goal of this project is to improve visibility with minimal lift by extracting information from various monitoring and management devices to allow for insights that are not possible on their own.  Additionally, this will generate a tabular version of the Omnipod data, extracting information from comments, etc. for easier analysis. 
 
 After cloning this repository and installing the required software, you'll need to enter the name of your files and run all cells in the workbook.
 
