@@ -473,12 +473,12 @@ def glucose_bolus_df(df_o, df_d,
     :return: A dataframe combining both sets of information.
     """
 
-    if max_date is not None and isinstance(max_date, datetime.datetime):
+    if max_date is not None and not isinstance(max_date, datetime.datetime):
         raise TypeError('max_date must be datetime.')
     elif max_date is None:
         max_date = datetime.datetime.today()
 
-    if min_date is not None and isinstance(min_date, datetime.datetime):
+    if min_date is not None and not isinstance(min_date, datetime.datetime):
         raise TypeError('min_date must be datetime.')
 
     # First, select only bolus data from this dataframe
