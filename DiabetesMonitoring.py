@@ -23,6 +23,7 @@ from datetime import time
 import dateutil
 import numpy as np
 import holoviews as hv
+
 hv.extension('bokeh')
 
 __version__ = '0.1'
@@ -137,8 +138,8 @@ class Diabetic(Person):
 regexMeal_IOB = r"""Meal IOB: (\d{0,2}\.\d{1,2})(?=;)"""
 regexCorrection_IOB = r"""Correction IOB: (\d{0,2}\.\d{0,2})"""
 varOverride = "Override"
-omnipod_data_save = r'DiabetesManagement\Data\Omnipod\Generated'
-dexcom_data_save = r'DiabetesManagement\Data\Dexcom\Generated'
+omnipod_data_save = os.path.join('DiabetesManagement', 'Data', 'Omnipod', 'Generated')
+dexcom_data_save = os.path.join('DiabetesManagement', 'Data', 'Dexcom', 'Generated')
 
 
 class DiabetesData(object):
