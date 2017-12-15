@@ -17,10 +17,10 @@ University of Utah
 
 """
 import os
-import dateutil
 import pandas as pd
 import datetime
 from datetime import time
+import dateutil
 import numpy as np
 import holoviews as hv
 hv.extension('bokeh')
@@ -77,7 +77,7 @@ class Person(object):
 
     @first_name.setter
     def first_name(self, value):
-        if value == None:
+        if value is None:
             if self.sex == 'F':
                 value = "Jane"
             else:
@@ -119,7 +119,6 @@ class Diabetic(Person):
         if type(value) == float:
             self.a1c_target = value
 
-
     @property
     def eag_target(self):
         """
@@ -138,6 +137,8 @@ class Diabetic(Person):
 regexMeal_IOB = r"""Meal IOB: (\d{0,2}\.\d{1,2})(?=;)"""
 regexCorrection_IOB = r"""Correction IOB: (\d{0,2}\.\d{0,2})"""
 varOverride = "Override"
+omnipod_data_save = r'DiabetesManagement\Data\Omnipod\Generated'
+dexcom_data_save = r'DiabetesManagement\Data\Dexcom\Generated'
 
 
 class DiabetesData(object):
@@ -168,28 +169,31 @@ class DiabetesData(object):
     def read_data(self):
         """
         A function to read data into a dataframe from a variety of sources.
-        :return:
+
+        :return: A diabetes dataframe.  This dataframe is also saved in the Generated subfolder
+        of your data directory.
         """
-        if self.file_format == ".xlsx" and self.data_source == "Omnipod":
+        if self.file_format == ".xlsx" and self.data_source.upper() == "OMNIPOD":
             diabetes_dataframe = pd.read_excel(self.path, na_values='').fillna('0 NoDescription') \
                 .drop_duplicates()
-        elif self.file_format == ".csv" and self.data_source == "Omnipod":
+        elif self.file_format == ".csv" and self.data_source.upper() == "OMNIPOD":
             diabetes_dataframe = pd.read_csv(self.path, na_values='').fillna('0 NoDescription') \
                 .drop_duplicates()
 
         # By definition, Dexcom data should not contain duplicates.
-        elif self.file_format == ".xlsx" and self.data_source == "Dexcom":
+        elif self.file_format == ".xlsx" and self.data_source.upper() == "DEXCOM":
             diabetes_dataframe = pd.read_excel(self.path, header=0, skiprows=range(1, 15)) \
                 .dropna(how="all", axis=1).drop_duplicates()
-        elif self.file_format == ".csv" and self.data_source == "Dexcom":
+        elif self.file_format == ".csv" and self.data_source.upper() == "DEXCOM":
             diabetes_dataframe = pd.read_csv(self.path, header=0, skiprows=range(1, 15)). \
                 dropna(how="all", axis=1).drop_duplicates()
         else:
-            print("Function only accepts raw Omnipod log or Dexcom file (from Clarity).")
+            print("Function only accepts raw Omnipod (log) or Dexcom file (from Clarity).")
 
         # Generate a pickle file to save the data
         timestr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        diabetes_dataframe.to_csv(self.directory+self.data_source+timestr+".csv")  #, compression='gzip')
+        diabetes_dataframe.to_csv(self.directory+'\\Generated\\'+self.data_source+'_Read_'+timestr+".csv",
+                                  compression='gzip')
 
         return diabetes_dataframe
 
@@ -216,11 +220,11 @@ class Omnipod(DiabetesData):
 
 
 def omnipod_remove_summary(x):
-    df = x[x.Type != 'Insulin Summary']
-    df = df[df.Type != 'Notes']
-    df = df[df.Type != 'Pump Alarm']
-    df = df[df.Type != 'Glucose']
-    return df
+    df_x = x[x.Type != 'Insulin Summary']
+    df_x = df_x[df_x.Type != 'Notes']
+    df_x = df_x[df_x.Type != 'Pump Alarm']
+    df_x = df_x[df_x.Type != 'Glucose']
+    return df_x
 
 
 def omnipod_extract_dedup(df_i):
@@ -282,14 +286,15 @@ def omnipod_to_tabular(df_i):
     """
     A function to convert omnipod data in a dataframe to a usable (tabular) format for visualization
     :param df_i:
-    :return:
+    :return: A cleaned up and tabularized Omnipod dataframe.  This data is also saved as a gzip to the Generated
+    sub-folder in the Data section of your repository.  This will allow you to explore the data in excel as well.
     """
-    df = omnipod_remove_summary(df_i)
-    df = omnipod_extract_dedup(df)
-    df_pivot = df.pivot(index='Date Time', columns='Bolus Clean', values='Value')
+    df_o = omnipod_remove_summary(df_i)
+    df_o = omnipod_extract_dedup(df_o)
+    df_pivot = df_o.pivot(index='Date Time', columns='Bolus Clean', values='Value')
     df_pivot['Date Time'] = df_pivot.index  # Add Date Time index back into dataframe as a column
 
-    new = pd.merge(df_pivot, df, how='inner', on='Date Time')
+    new = pd.merge(df_pivot, df_o, how='inner', on='Date Time')
 
     # Removed glucose and pump alarm because they were causing duplicated.  12-14-17
     new = new[['Date Time',
@@ -303,8 +308,9 @@ def omnipod_to_tabular(df_i):
     new = new.replace(np.NaN, 0.00).drop_duplicates()
 
     # create a csv with the newly cleaned dataframe
-    #timestr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    #new.to_csv(DiabetesData.directory + Omnipod.data_source + "tabular" + timestr + ".csv")  # , compression='gzip')
+    timestr = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    npath = os.path.abspath(os.path.join("..", omnipod_data_save, "Omnipod_Tabular" + timestr + ".csv"))
+    new.to_csv(npath)  # , compression='gzip')
 
     return new
 
@@ -316,9 +322,9 @@ def average_bolus(df_i, list_cols=['Date', 'Meal Bolus', 'Correction Bolus', 'Bo
     param: df_i - use the cleaned up insulin dataframe, the step after reading the data in
     """
     df = df_i[list_cols]
-    x = df.replace(0, np.NaN)
-    y = (x.mean(), x.count())
-    return y
+    df_x = df.replace(0, np.NaN)
+    df_y = (df_x.mean(), df_x.count())
+    return df_y
 
 
 def daily_bolus(df_i):
@@ -329,7 +335,6 @@ def daily_bolus(df_i):
 
     table = pd.pivot_table(df_i, values='Total Bolus', index='Date', aggfunc=np.sum).reset_index()
     table['Date'] = table['Date'].astype('datetime64[ns]')
-    #table = table[list_cols]
     return table
 
 
@@ -389,13 +394,13 @@ def bolus_efficacy(df_o, df_d, shift_minutes=120,
         - A dataframe containing both Dexcom (blood sugar) and Omnipod (insulin) information.
     """
 
-    if max_date is not None and type(max_date) != datetime.datetime:
+    if max_date is not None and not isinstance(max_date, datetime.datetime):
         raise TypeError('max_date must be datetime.')
 
     elif max_date is None:
         max_date = datetime.datetime.today()
 
-    if min_date is not None and type(min_date) != datetime.datetime:
+    if min_date is not None and not isinstance(min_date, datetime.datetime):
         raise TypeError('min_date must be datetime.')
 
     bolus = df_o[['Date Time', 'Date', 'Time',
@@ -468,18 +473,16 @@ def glucose_bolus_df(df_o, df_d,
     :return: A dataframe combining both sets of information.
     """
 
-    if max_date is not None and type(max_date) != datetime.datetime:
+    if max_date is not None and isinstance(max_date, datetime.datetime):
         raise TypeError('max_date must be datetime.')
     elif max_date is None:
         max_date = datetime.datetime.today()
 
-    if min_date is not None and type(min_date) != datetime.datetime:
+    if min_date is not None and isinstance(min_date, datetime.datetime):
         raise TypeError('min_date must be datetime.')
 
     # First, select only bolus data from this dataframe
-    df_o['Total Bolus'] = df_o['Meal Bolus'] + \
-                          df_o['Bolus Insulin'] + \
-                          df_o['Correction Bolus']
+    df_o['Total Bolus'] = df_o['Meal Bolus'] + df_o['Bolus Insulin'] + df_o['Correction Bolus']
 
     df_o = df_o[(df_o['Total Bolus'] > 0.0)]
 
