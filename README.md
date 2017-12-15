@@ -1,8 +1,10 @@
 # Diabetes Management
 
-While there are a variety of technologies out there today that make managing diabetes easier, they are generally single-purpose and integration of information between multiple devices can mean double or triple entry of information.  The goal is this project is to  extract information from various monitoring and management devices to allow for insights that are not possible when using them on their own.
+While there are a variety of technologies out there today that make managing diabetes easier, they are generally single-purpose and integration of information between multiple devices can mean double or triple entry of information.  
 
-The goal of this project is to improve visibility with minimal lift.  After cloning this repository and installing the required software, you'll need to enter the name of your files and run all cells in the workbook.
+The goal of this project is to improve visibility with minimal lift by extracting information from various monitoring and management devices to allow for insights that are not possible on their own.  
+
+After cloning this repository and installing the required software, you'll need to enter the name of your files and run all cells in the workbook.
 
 ## Background
 
