@@ -4,7 +4,7 @@ While there are a variety of technologies out there today that make managing dia
 
 The goal of this project is to improve visibility with minimal lift by extracting information from various monitoring and management devices to allow for insights that are not possible on their own.  Additionally, this will generate a tabular version of the Omnipod data, extracting information from comments, etc. for easier analysis. 
 
-After cloning this repository and installing the required software, you'll need to enter the name of your files and run all cells in the workbook.
+After cloning this repository and installing the required software, you'll need to enter the name of your files and run all cells in the Jupyter Notebook.
 
 ## Background
 
@@ -48,7 +48,7 @@ Once all files are located in their place, you will just need to use the file pa
 Note: For a variety of reasons, the Dexcom calibration may not be accurate.  Some of these reasons include blood sugar volatility during the warm-up phase of the device (occurs weekly), a faulty insertion (blood affecting the measurement), or over-calibration.
 ```
 
-### Prerequisites
+### Prerequisites [ Will add Requirements file ]
 
 Software
 - FreeStyle CoPilot Health Management System
