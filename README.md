@@ -2,7 +2,7 @@
 
 While there are a variety of technologies out there today that make managing diabetes easier, they are generally single-purpose and integration of information between multiple devices can mean double or triple entry of information.  
 
-The goal of this project is to improve visibility with minimal lift by extracting information from various monitoring and management devices to allow for insights that are not possible on their own.  Additionally, this will generate a tabular version of the Omnipod data, extracting information from comments, etc. for easier analysis. 
+The goal of this project is to improve visibility with minimal lift by extracting information from various monitoring and management devices to allow for insights that are not possible on their own.  Additionally, this will generate a tabular version of the Omnipod data, extracting information from comments, etc. for easier analysis.
 
 After cloning this repository and installing the required software, you'll need to enter the name of your files and run all cells in the workbook.
 
@@ -24,7 +24,7 @@ Currently, this project supports two types of (.csv or .xlsx) files:
 - Dexcom: Export from your Dexcom Clarity account - Maximum download is 90 days.
 	- https://clarity.dexcom.com
 	- Reports > Export
-	
+
 To use this package, clone the repository and move copies of your Omnipod and Dexcom data into the corresponding folders in the repository.  
 For reference, files are places in the repository now.
 
@@ -53,7 +53,7 @@ Note: For a variety of reasons, the Dexcom calibration may not be accurate.  Som
 Software
 - FreeStyle CoPilot Health Management System
 	- For instructions: https://www.myomnipod.com/learning-center/download-software/download-abbott
-- Python 
+- Python
 - Jupyter Notebook
 
 Python Packages to install (imports are in the file but you made need to install some first)
@@ -64,6 +64,7 @@ Python Packages to install (imports are in the file but you made need to install
 - datetime
 - dateutil
 - numpy
+- xlrd
 
 ## Contributing
 
@@ -84,4 +85,3 @@ This project is licensed under the GNU License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments
 
 My husband for expanding my understanding of the complex world of diabetes management and for explaining the many variables that exist within each of the systems.
-
